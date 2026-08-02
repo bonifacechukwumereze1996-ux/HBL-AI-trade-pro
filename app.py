@@ -214,43 +214,42 @@ for pair in pairs:
         "Price": price
 
     })
-  if "last_signal" not in st.session_state:
-    st.session_state.last_signal = {}
+      if "last_signal" not in st.session_state:
+        st.session_state.last_signal = {}
+
     # ---------------------------------------
     # TELEGRAM ALERT
     # ---------------------------------------
 
-   if decision["approved"]:
+    if decision["approved"]:
 
-    previous_signal = st.session_state.last_signal.get(pair)
+        previous_signal = st.session_state.last_signal.get(pair)
 
-    if previous_signal != decision["signal"]:
+        if previous_signal != decision["signal"]:
 
-        message = notify.signal_message(
-            pair=pair,
-            signal=decision["signal"],
-            confidence=decision["confidence"],
-            price=price,
-            timeframe=timeframe,
-            reasons=decision["reasons"]
-        )
+            message = notify.signal_message(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                price=price,
+                timeframe=timeframe,
+                reasons=decision["reasons"]
+            )
 
-        notify.send_telegram(message)
+            notify.send_telegram(message)
 
-        history.save(
-            pair=pair,
-            signal=decision["signal"],
-            confidence=decision["confidence"],
-            price=price,
-            timeframe=timeframe,
-            status=decision["status"]
-        )
+            history.save(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                price=price,
+                timeframe=timeframe,
+                status=decision["status"]
+            )
 
-        risk.register_trade()
+            risk.register_trade()
 
-        st.session_state.last_signal[pair] = decision["signal"]
-
-# ---------------------------------------------------
+            st.session_state.last_signal[pair] = decision["signal"] ---------------------------------------------------
 # RESULTS DATAFRAME
 # ---------------------------------------------------
 
