@@ -90,6 +90,10 @@ pairs = st.sidebar.multiselect(
         "GBPUSD=X",
         "USDJPY=X",
         "AUDUSD=X",
+        "BOOM500",
+        "BOOM1000",
+        "CRASH500",
+        "CRASH1000"
         "USDCAD=X",
         "USDCHF=X",
         "NZDUSD=X",
