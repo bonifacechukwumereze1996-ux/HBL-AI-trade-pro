@@ -15,7 +15,12 @@ DEFAULT_PAIRS = [
     "EURUSD=X",
     "GBPUSD=X",
     "USDJPY=X",
-    "AUDUSD=X"
+    "AUDUSD=X",
+
+    "BOOM500",
+    "BOOM1000",
+    "CRASH500",
+    "CRASH1000"
 ]
 
 # -----------------------------
