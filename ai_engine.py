@@ -1,43 +1,50 @@
 """
-=========================================
-HBL AI TRADER PRO v2.0
+HBL AI Trader Pro
 AI Decision Engine
-=========================================
 """
 
-from config import AI_CONFIDENCE
+from config import MIN_CONFIDENCE
 
 
 class AIEngine:
 
     def evaluate(self, analysis):
 
-        confidence = analysis["confidence"]
-        signal = analysis["signal"]
+        buy = analysis["buy_score"]
+        sell = analysis["sell_score"]
 
-        if signal == "WAIT":
-            return {
-                "approved": False,
-                "signal": "WAIT",
-                "confidence": confidence,
-                "status": "No Trade",
-                "reasons": analysis["reasons"]
-            }
+        signal = "WAIT"
+        confidence = 50
+        approved = False
+        status = "No Trade"
 
-        if confidence >= AI_CONFIDENCE:
+        total = buy + sell
 
-            return {
-                "approved": True,
-                "signal": signal,
-                "confidence": confidence,
-                "status": "APPROVED",
-                "reasons": analysis["reasons"]
-            }
+        if total > 0:
+            confidence = int((max(buy, sell) / total) * 100)
+
+        # BUY Decision
+        if buy >= 3 and analysis["strong_trend"]:
+            signal = "BUY"
+            status = "Approved"
+
+        # SELL Decision
+        elif sell >= 3 and analysis["strong_trend"]:
+            signal = "SELL"
+            status = "Approved"
+
+        # Confidence Check
+        if confidence >= MIN_CONFIDENCE and signal != "WAIT":
+            approved = True
+        else:
+            approved = False
+            if signal != "WAIT":
+                status = "Low Confidence"
 
         return {
-            "approved": False,
             "signal": signal,
             "confidence": confidence,
-            "status": "LOW CONFIDENCE",
+            "approved": approved,
+            "status": status,
             "reasons": analysis["reasons"]
         }
