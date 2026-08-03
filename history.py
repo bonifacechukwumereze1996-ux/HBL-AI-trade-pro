@@ -14,8 +14,7 @@ class TradeHistory:
 
     def __init__(self):
 
-        self.file_path = "data/trade_history.csv"
-
+        self.file_path = "trade_history.csv"
         self.columns = [
             "Date",
             "Time",
