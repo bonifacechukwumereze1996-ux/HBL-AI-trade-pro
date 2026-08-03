@@ -275,3 +275,68 @@ else:
         use_container_width=True,
         hide_index=True
     )
+# ---------------------------------------
+# LIVE CHARTS
+# ---------------------------------------
+
+st.subheader("📈 Live Market Charts")
+
+for pair in pairs:
+
+    df = market.get_data(pair, timeframe)
+
+    if df is None or df.empty:
+        continue
+
+    df = indicator.calculate(df)
+
+    if df.empty:
+        continue
+
+    with st.expander(f"📊 {pair}"):
+
+        fig = go.Figure()
+
+        fig.add_candlestick(
+            x=df.index,
+            open=df["Open"],
+            high=df["High"],
+            low=df["Low"],
+            close=df["Close"],
+            name=pair
+        )
+
+        fig.add_scatter(
+            x=df.index,
+            y=df["EMA10"],
+            name="EMA 10"
+        )
+
+        fig.add_scatter(
+            x=df.index,
+            y=df["EMA25"],
+            name="EMA 25"
+        )
+
+        fig.update_layout(
+            height=500,
+            xaxis_rangeslider_visible=False
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+# ---------------------------------------
+# FOOTER
+# ---------------------------------------
+
+st.divider()
+
+st.caption(
+    f"{APP_NAME} v{VERSION} | "
+    "Educational Purposes Only | "
+    "Powered by Python, Streamlit & Yahoo Finance"
+)
+
