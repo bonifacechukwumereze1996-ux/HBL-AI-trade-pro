@@ -13,32 +13,19 @@ class AIEngine:
         buy = analysis["buy_score"]
         sell = analysis["sell_score"]
 
-        signal = "WAIT"
-        confidence = 50
+        signal = analysis["signal"]
+        confidence = analysis["confidence"]
+
         approved = False
         status = "No Trade"
 
-        total = buy + sell
+        if signal != "WAIT":
 
-        if total > 0:
-            confidence = int((max(buy, sell) / total) * 100)
-
-        # BUY Decision
-        if buy >= 3 and analysis["strong_trend"]:
-            signal = "BUY"
-            status = "Approved"
-
-        # SELL Decision
-        elif sell >= 3 and analysis["strong_trend"]:
-            signal = "SELL"
-            status = "Approved"
-
-        # Confidence Check
-        if confidence >= MIN_CONFIDENCE and signal != "WAIT":
-            approved = True
-        else:
-            approved = False
-            if signal != "WAIT":
+            if confidence >= MIN_CONFIDENCE:
+                approved = True
+                status = "Approved"
+            else:
+                approved = False
                 status = "Low Confidence"
 
         return {
