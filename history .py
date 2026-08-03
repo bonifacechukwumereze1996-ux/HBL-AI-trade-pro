@@ -1,12 +1,10 @@
 """
-=========================================
-HBL AI TRADER PRO v2.0
+HBL AI Trader Pro
 Trade History Module
-=========================================
 """
 
-import os
 import pandas as pd
+import os
 from datetime import datetime
 
 
@@ -14,31 +12,21 @@ class TradeHistory:
 
     def __init__(self):
 
-        self.file_path = "data/trade_history.csv"
+        self.file = "trade_history.csv"
 
-        self.columns = [
-            "Date",
-            "Time",
-            "Pair",
-            "Signal",
-            "Confidence",
-            "Price",
-            "Timeframe",
-            "Status"
-        ]
+        if not os.path.exists(self.file):
 
-        self.create_file()
-
-    def create_file(self):
-
-        if not os.path.exists(self.file_path):
-
-            df = pd.DataFrame(columns=self.columns)
-
-            df.to_csv(
-                self.file_path,
-                index=False
-            )
+            pd.DataFrame(
+                columns=[
+                    "Date",
+                    "Pair",
+                    "Signal",
+                    "Confidence",
+                    "Price",
+                    "Timeframe",
+                    "Status"
+                ]
+            ).to_csv(self.file, index=False)
 
     def save(
         self,
@@ -50,28 +38,30 @@ class TradeHistory:
         status
     ):
 
-        now = datetime.now()
+        row = pd.DataFrame([
+            {
+                "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "Pair": pair,
+                "Signal": signal,
+                "Confidence": confidence,
+                "Price": price,
+                "Timeframe": timeframe,
+                "Status": status
+            }
+        ])
 
-        row = {
-            "Date": now.strftime("%Y-%m-%d"),
-            "Time": now.strftime("%H:%M:%S"),
-            "Pair": pair,
-            "Signal": signal,
-            "Confidence": confidence,
-            "Price": price,
-            "Timeframe": timeframe,
-            "Status": status
-        }
-
-        df = pd.read_csv(self.file_path)
-
-        df.loc[len(df)] = row
-
-        df.to_csv(
-            self.file_path,
+        row.to_csv(
+            self.file,
+            mode="a",
+            header=False,
             index=False
         )
 
     def load(self):
 
-        return pd.read_csv(self.file_path)
+        try:
+            return pd.read_csv(self.file)
+
+        except Exception:
+
+            return pd.DataFrame()
