@@ -219,3 +219,59 @@ for pair in pairs:
             risk.register_trade()
 
             st.session_state.last_signal[pair] = decision["signal"]
+# ---------------------------------------
+# RESULTS DATAFRAME
+# ---------------------------------------
+
+results_df = pd.DataFrame(results)
+
+# ---------------------------------------
+# SIGNAL TABLE
+# ---------------------------------------
+
+st.subheader("📊 Live AI Trading Signals")
+
+if results_df.empty:
+
+    st.warning("No market data available.")
+
+else:
+
+    def highlight_signal(row):
+
+        if row["Signal"] == "BUY":
+            return ["background-color:#00C853;color:white"] * len(row)
+
+        elif row["Signal"] == "SELL":
+            return ["background-color:#D50000;color:white"] * len(row)
+
+        elif row["Signal"] == "WAIT":
+            return ["background-color:#FFD600;color:black"] * len(row)
+
+        return [""] * len(row)
+
+    st.dataframe(
+        results_df.style.apply(highlight_signal, axis=1),
+        use_container_width=True,
+        hide_index=True
+    )
+
+# ---------------------------------------
+# TRADE HISTORY
+# ---------------------------------------
+
+st.subheader("📜 Trade History")
+
+history_df = history.load()
+
+if history_df.empty:
+
+    st.info("No trades recorded yet.")
+
+else:
+
+    st.dataframe(
+        history_df,
+        use_container_width=True,
+        hide_index=True
+    )
