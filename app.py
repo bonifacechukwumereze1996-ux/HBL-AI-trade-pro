@@ -133,3 +133,89 @@ st.divider()
 # ---------------------------------------
 
 results = []
+# ---------------------------------------
+# ANALYZE EACH PAIR
+# ---------------------------------------
+
+for pair in pairs:
+
+    df = market.get_data(pair, timeframe)
+
+    if df is None:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Unavailable",
+            "Price": "-"
+        })
+
+        continue
+
+    # Calculate Indicators
+    df = indicator.calculate(df)
+
+    if df.empty:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Indicator Error",
+            "Price": "-"
+        })
+
+        continue
+
+    # Latest candle
+    last = df.iloc[-1]
+
+    # Strategy Analysis
+    analysis = strategy.analyze(last)
+
+    # AI Decision
+    decision = ai.evaluate(analysis)
+
+    # Current Price
+    price = round(float(last["Close"]), 5)
+
+    # Save Result
+    results.append({
+        "Pair": pair,
+        "Signal": decision["signal"],
+        "Confidence": f'{decision["confidence"]}%',
+        "Status": decision["status"],
+        "Price": price
+    })
+
+    # Telegram Alert
+    if decision["approved"]:
+
+        previous = st.session_state.last_signal.get(pair)
+
+        if previous != decision["signal"]:
+
+            message = notify.signal_message(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                price=price,
+                timeframe=timeframe,
+                reasons=decision["reasons"]
+            )
+
+            notify.send_telegram(message)
+
+            history.save(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                price=price,
+                timeframe=timeframe,
+                status=decision["status"]
+            )
+
+            risk.register_trade()
+
+            st.session_state.last_signal[pair] = decision["signal"]
