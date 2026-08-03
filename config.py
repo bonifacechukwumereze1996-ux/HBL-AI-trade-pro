@@ -12,15 +12,7 @@ AUTO_REFRESH = 30
 DEFAULT_TIMEFRAME = "5m"
 
 DEFAULT_PAIRS = [
-    "EURUSD=X",
-    "GBPUSD=X",
-    "USDJPY=X",
-    "AUDUSD=X",
-
-    "BOOM500",
-    "BOOM1000",
-    "CRASH500",
-    "CRASH1000"
+   
 ]
 
 # -----------------------------
