@@ -1,19 +1,14 @@
 """
-=========================================
-HBL AI TRADER PRO v2.0
+HBL AI Trader Pro
 Configuration File
-=========================================
 """
 
-# -----------------------------
-# APP SETTINGS
-# -----------------------------
 APP_NAME = "HBL AI Trader Pro"
-VERSION = "2.0.0"
 
-# -----------------------------
-# DEFAULT TRADING SETTINGS
-# -----------------------------
+VERSION = "3.0"
+
+AUTO_REFRESH = 30
+
 DEFAULT_TIMEFRAME = "5m"
 
 DEFAULT_PAIRS = [
@@ -23,39 +18,20 @@ DEFAULT_PAIRS = [
     "AUDUSD=X"
 ]
 
-AUTO_REFRESH = 30  # seconds
+# -----------------------------
+# TELEGRAM SETTINGS
+# -----------------------------
+
+BOT_TOKEN = "YOUR_BOT_TOKEN"
+
+CHAT_ID = "YOUR_CHAT_ID"
 
 # -----------------------------
-# AI SETTINGS
+# RISK SETTINGS
 # -----------------------------
-AI_CONFIDENCE = 80  # Minimum confidence before a signal
 
-# -----------------------------
-# RISK MANAGEMENT
-# -----------------------------
-MAX_TRADES_PER_DAY = 10
+MAX_TRADES_PER_DAY = 20
 
-MAX_DAILY_LOSS = 5      # Percent
+MAX_DAILY_LOSS = 5
 
-RISK_PER_TRADE = 1      # Percent
-
-# -----------------------------
-# TELEGRAM
-# -----------------------------
-BOT_TOKEN = ""
-
-CHAT_ID = ""
-
-# -----------------------------
-# WHATSAPP
-# -----------------------------
-WHATSAPP_ENABLED = False
-
-# -----------------------------
-# COLORS
-# -----------------------------
-BUY_COLOR = "#00C853"
-
-SELL_COLOR = "#D50000"
-
-WAIT_COLOR = "#FFD600"
+MIN_CONFIDENCE = 80
