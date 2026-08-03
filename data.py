@@ -1,41 +1,35 @@
 """
-=========================================
-HBL AI TRADER PRO v2.0
+HBL AI Trader Pro
 Market Data Module
-=========================================
 """
 
 import yfinance as yf
-import pandas as pd
 
 
 class MarketData:
 
-    def __init__(self):
-        self.period_map = {
-            "1m": "1d",
-            "5m": "5d",
-            "15m": "7d",
-            "1h": "30d"
-        }
+    def get_data(self, pair, timeframe):
 
-        self.interval_map = {
+        interval_map = {
             "1m": "1m",
             "5m": "5m",
             "15m": "15m",
             "1h": "60m"
         }
 
-    def get_data(self, pair, timeframe):
-
-        symbol = pair.replace(" OTC", "=X")
+        period_map = {
+            "1m": "1d",
+            "5m": "5d",
+            "15m": "5d",
+            "1h": "1mo"
+        }
 
         try:
 
             df = yf.download(
-                symbol,
-                interval=self.interval_map[timeframe],
-                period=self.period_map[timeframe],
+                pair,
+                interval=interval_map[timeframe],
+                period=period_map[timeframe],
                 progress=False,
                 auto_adjust=False
             )
@@ -43,21 +37,11 @@ class MarketData:
             if df.empty:
                 return None
 
-            if isinstance(df.columns, pd.MultiIndex):
+            # Flatten multi-level columns if needed
+            if hasattr(df.columns, "nlevels") and df.columns.nlevels > 1:
                 df.columns = df.columns.get_level_values(0)
-
-            required = ["Open", "High", "Low", "Close", "Volume"]
-
-            for col in required:
-                if col not in df.columns:
-                    return None
-
-            df = df.dropna()
 
             return df
 
-        except Exception as e:
-
-            print("Market Data Error:", e)
-
+        except Exception:
             return None
