@@ -145,6 +145,9 @@ results = []
 
 for pair in pairs:
 
+    if pair.startswith("BOOM") or pair.startswith("CRASH"):
+    df = deriv.get_data(pair, timeframe)
+else:
     df = market.get_data(pair, timeframe)
 
     if df is None:
