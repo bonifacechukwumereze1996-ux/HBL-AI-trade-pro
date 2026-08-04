@@ -58,6 +58,7 @@ if "last_signal" not in st.session_state:
 # ---------------------------------------
 
 market = MarketData()
+deriv = DerivMarketData()
 indicator = IndicatorEngine()
 strategy = StrategyEngine()
 ai = AIEngine()
