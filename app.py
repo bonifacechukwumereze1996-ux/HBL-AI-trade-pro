@@ -19,6 +19,7 @@ from config import (
 )
 
 from data import MarketData
+from deriv_data import DerivMarketData
 from indicators import IndicatorEngine
 from strategy import StrategyEngine
 from ai_engine import AIEngine
