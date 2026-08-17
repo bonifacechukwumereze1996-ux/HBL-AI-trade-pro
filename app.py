@@ -226,7 +226,7 @@ candle_remaining = f"{remaining_minutes}m {remaining_secs}s"
     "Confidence": f'{decision["confidence"]}%',
     "Status": decision["status"],
     "Price": price,
-    "Candle Remaining": candle_remaining
+    "Candle Remaining":candle_remaining
 })
 
     # Telegram Alert
