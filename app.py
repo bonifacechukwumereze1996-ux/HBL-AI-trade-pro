@@ -102,6 +102,10 @@ pairs = st.sidebar.multiselect(
         "EURJPY=X",
         "GBPJPY=X",
         "AUDJPY=X",
+        "EURUSD OTC",
+        "GBPUSD OTC",
+        "USDJPY OTC",
+        "AUDUSD OTC"
     ],
     default=DEFAULT_PAIRS
 )
