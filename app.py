@@ -182,6 +182,34 @@ for pair in pairs:
 
     # Latest candle
     last = df.iloc[-1]
+# Candle close countdown
+timeframe_minutes = {
+    "1m": 1,
+    "5m": 5,
+    "15m": 15,
+    "1h": 60
+}
+
+candle_minutes = timeframe_minutes.get(timeframe, 5)
+
+candle_start = pd.Timestamp(last.name)
+
+if candle_start.tzinfo is not None:
+    current_time = pd.Timestamp.now(tz=candle_start.tz)
+else:
+    current_time = pd.Timestamp.now()
+
+candle_close = candle_start + pd.Timedelta(minutes=candle_minutes)
+
+remaining_seconds = max(
+    int((candle_close - current_time).total_seconds()),
+    0
+)
+
+remaining_minutes = remaining_seconds // 60
+remaining_secs = remaining_seconds % 60
+
+candle_remaining = f"{remaining_minutes}m {remaining_secs}s"
 
     # Strategy Analysis
     analysis = strategy.analyze(last)
