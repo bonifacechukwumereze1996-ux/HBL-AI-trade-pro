@@ -26,6 +26,10 @@ DEFAULT_PAIRS = [
         "EURJPY=X",
         "GBPJPY=X",
         "AUDJPY=X",
+        "EURUSD OTC",
+        "GBPUSD OTC",
+        "USDJPY OTC",
+        "AUDUSD OTC"
 ]
 
 # -----------------------------
