@@ -220,14 +220,14 @@ candle_remaining = f"{remaining_minutes}m {remaining_secs}s"
     # Current Price
     price = round(float(last["Close"]), 5)
 
-    # Save Result
-    results.append({
-        "Pair": pair,
-        "Signal": decision["signal"],
-        "Confidence": f'{decision["confidence"]}%',
-        "Status": decision["status"],
-        "Price": price
-    })
+    # results.append({
+    "Pair": pair,
+    "Signal": decision["signal"],
+    "Confidence": f'{decision["confidence"]}%',
+    "Status": decision["status"],
+    "Price": price,
+    "Candle Remaining": candle_remaining
+})
 
     # Telegram Alert
     if decision["approved"]:
