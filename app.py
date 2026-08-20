@@ -211,17 +211,23 @@ remaining_secs = remaining_seconds % 60
 
 candle_remaining = f"{remaining_minutes}m {remaining_secs}s"
 
-    # Strategy Analysis
-    analysis = strategy.analyze(last)
+   # Strategy Analysis
+analysis = strategy.analyze(last)
 
-    # AI Decision
-    decision = ai.evaluate(analysis)
+# AI Decision
+decision = ai.evaluate(analysis)
 
-    # Current Price
-    price = round(float(last["Close"]), 5)
+# Current Price
+price = round(float(last["Close"]), 5)
 
-    # results.append({
+results.append({
     "Pair": pair,
+    "Signal": decision["signal"],
+    "Confidence": f'{decision["confidence"]}%',
+    "Status": decision["status"],
+    "Price": price,
+    "Candle Remaining": candle_remaining
+})
     "Signal": decision["signal"],
     "Confidence": f'{decision["confidence"]}%',
     "Status": decision["status"],
