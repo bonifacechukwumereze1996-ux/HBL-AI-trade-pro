@@ -228,12 +228,6 @@ results.append({
     "Price": price,
     "Candle Remaining": candle_remaining
 })
-    "Signal": decision["signal"],
-    "Confidence": f'{decision["confidence"]}%',
-    "Status": decision["status"],
-    "Price": price,
-    "Candle Remaining":candle_remaining
-})
 
     # Telegram Alert
     if decision["approved"]:
