@@ -229,10 +229,9 @@ results.append({
     "Candle Remaining": candle_remaining
 })
 
-    # Telegram Alert
-    if decision["approved"]:
-
-        previous = st.session_state.last_signal.get(pair)
+ # Telegram Alert
+  if decision["approved"]:
+  previous = st.session_state.last_signal.get(pair)
 
         if previous != decision["signal"]:
 
