@@ -153,16 +153,16 @@ for pair in pairs:
         df = deriv.get_data(pair, timeframe)
     else:
         df = market.get_data(pair, timeframe)
-    if df is None or not isinstance(df, pd.DataFrame) or df.empty:
 
-    results.append({
-        "Pair": pair,
-        "Signal": "NO DATA",
-        "Confidence": 0,
-        "Status": "Unavailable",
-        "Price": "-"
-    })
-    continue
+    if df is None:
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Unavailable",
+            "Price": "-"
+       })
+       continue
 
     # Calculate Indicators
     df = indicator.calculate(df)
