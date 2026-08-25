@@ -64,7 +64,11 @@ strategy = StrategyEngine()
 ai = AIEngine()
 notify = Notifier()
 history = TradeHistory()
-risk = RiskManager()
+
+if "risk_manager" not in st.session_state:
+    st.session_state.risk_manager = RiskManager()
+
+risk = st.session_state.risk_manager
 
 # ---------------------------------------
 # HEADER
