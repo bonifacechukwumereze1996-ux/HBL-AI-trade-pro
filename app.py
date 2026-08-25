@@ -162,7 +162,6 @@ for pair in pairs:
         "Status": "Unavailable",
         "Price": "-"
     })
-
     continue
 
     # Calculate Indicators
