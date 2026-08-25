@@ -161,14 +161,13 @@ for pair in pairs:
             "Confidence": 0,
             "Status": "Unavailable",
             "Price": "-"
-       })
-       continue
+        })
+        continue
 
     # Calculate Indicators
     df = indicator.calculate(df)
 
     if df.empty:
-
         results.append({
             "Pair": pair,
             "Signal": "NO DATA",
@@ -176,131 +175,119 @@ for pair in pairs:
             "Status": "Indicator Error",
             "Price": "-"
         })
-
         continue
 
     # ---------------------------------------
-# CANDLE TIMING
-# ---------------------------------------
+    # CANDLE TIMING
+    # ---------------------------------------
 
-timeframe_minutes = {
-    "1m": 1,
-    "5m": 5,
-    "15m": 15,
-    "1h": 60
-}
+    timeframe_minutes = {
+        "1m": 1,
+        "5m": 5,
+        "15m": 15,
+        "1h": 60
+    }
 
-candle_minutes = timeframe_minutes.get(timeframe, 5)
+    candle_minutes = timeframe_minutes.get(timeframe, 5)
 
-latest = df.iloc[-1]
+    latest = df.iloc[-1]
 
-candle_start = pd.Timestamp(latest.name)
+    candle_start = pd.Timestamp(latest.name)
 
-if candle_start.tzinfo is not None:
-    current_time = pd.Timestamp.now(tz=candle_start.tz)
-else:
-    current_time = pd.Timestamp.now()
+    if candle_start.tzinfo is not None:
+        current_time = pd.Timestamp.now(tz=candle_start.tz)
+    else:
+        current_time = pd.Timestamp.now()
 
-candle_close = candle_start + pd.Timedelta(minutes=candle_minutes)
+    candle_close = candle_start + pd.Timedelta(
+        minutes=candle_minutes
+    )
 
-# ---------------------------------------
-# USE COMPLETED CANDLE ONLY
-# ---------------------------------------
+    # ---------------------------------------
+    # USE COMPLETED CANDLE ONLY
+    # ---------------------------------------
 
-if current_time < candle_close and len(df) >= 2:
-    last = df.iloc[-2]
-    signal_candle_start = pd.Timestamp(df.index[-2])
-else:
-    last = df.iloc[-1]
-    signal_candle_start = pd.Timestamp(df.index[-1])
+    if current_time < candle_close and len(df) >= 2:
+        last = df.iloc[-2]
+    else:
+        last = df.iloc[-1]
 
-# ---------------------------------------
-# CANDLE COUNTDOWN
-# ---------------------------------------
+    # ---------------------------------------
+    # CANDLE COUNTDOWN
+    # ---------------------------------------
 
-remaining_seconds = max(
-    int((candle_close - current_time).total_seconds()),
-    0
-)
+    remaining_seconds = max(
+        int((candle_close - current_time).total_seconds()),
+        0
+    )
 
-remaining_minutes = remaining_seconds // 60
-remaining_secs = remaining_seconds % 60
+    remaining_minutes = remaining_seconds // 60
+    remaining_secs = remaining_seconds % 60
 
-candle_remaining = f"{remaining_minutes}m {remaining_secs}s"
-timeframe_minutes = {
-    "1m": 1,
-    "5m": 5,
-    "15m": 15,
-    "1h": 60
-}
+    candle_remaining = (
+        f"{remaining_minutes}m {remaining_secs}s"
+    )
 
-candle_minutes = timeframe_minutes.get(timeframe, 5)
+    # ---------------------------------------
+    # STRATEGY ANALYSIS
+    # ---------------------------------------
 
-candle_start = pd.Timestamp(last.name)
+    analysis = strategy.analyze(last)
 
-if candle_start.tzinfo is not None:
-    current_time = pd.Timestamp.now(tz=candle_start.tz)
-else:
-    current_time = pd.Timestamp.now()
+    # ---------------------------------------
+    # AI DECISION
+    # ---------------------------------------
 
-candle_close = candle_start + pd.Timedelta(minutes=candle_minutes)
+    decision = ai.evaluate(analysis)
 
-remaining_seconds = max(
-    int((candle_close - current_time).total_seconds()),
-    0
-)
+    # ---------------------------------------
+    # CURRENT PRICE
+    # ---------------------------------------
 
-remaining_minutes = remaining_seconds // 60
-remaining_secs = remaining_seconds % 60
+    price = round(float(last["Close"]), 5)
 
-candle_remaining = f"{remaining_minutes}m {remaining_secs}s"
+    results.append({
+        "Pair": pair,
+        "Signal": decision["signal"],
+        "Confidence": f'{decision["confidence"]}%',
+        "Status": decision["status"],
+        "Price": price,
+        "Candle Remaining": candle_remaining
+    })
 
-   # Strategy Analysis
-analysis = strategy.analyze(last)
+    # ---------------------------------------
+    # TELEGRAM ALERT
+    # ---------------------------------------
 
-# AI Decision
-decision = ai.evaluate(analysis)
+    if decision["approved"]:
 
-# Current Price
-price = round(float(last["Close"]), 5)
+        previous = st.session_state.last_signal.get(pair)
 
-results.append({
-    "Pair": pair,
-    "Signal": decision["signal"],
-    "Confidence": f'{decision["confidence"]}%',
-    "Status": decision["status"],
-    "Price": price,
-    "Candle Remaining": candle_remaining
-})
+        if previous != decision["signal"]:
 
- # Telegram Alert
-if decision["approved"]:
-    previous = st.session_state.last_signal.get(pair)
+            message = notify.signal_message(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                price=price,
+                timeframe=timeframe,
+                reasons=decision["reasons"]
+            )
 
-    if previous != decision["signal"]:
-        message = notify.signal_message(
-            pair=pair,
-            signal=decision["signal"],
-            confidence=decision["confidence"],
-            price=price,
-            timeframe=timeframe,
-            reasons=decision["reasons"]
-        )
+            notify.send_telegram(message)
 
-        notify.send_telegram(message)
+            history.save(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                price=price,
+                timeframe=timeframe,
+                status=decision["status"]
+            )
 
-        history.save(
-            pair=pair,
-            signal=decision["signal"],
-            confidence=decision["confidence"],
-            price=price,
-            timeframe=timeframe,
-            status=decision["status"]
-        )
+            risk.register_trade()
 
-        risk.register_trade()
-
-        st.session_state.last_signal[pair] = decision["signal"]
+            st.session_state.last_signal[pair] = decision["signal"]
 # ---------------------------------------
 # RESULTS DATAFRAME
 # ---------------------------------------
