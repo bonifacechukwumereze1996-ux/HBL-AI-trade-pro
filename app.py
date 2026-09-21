@@ -26,6 +26,8 @@ from ai_engine import AIEngine
 from notifier import Notifier
 from history import TradeHistory
 from risk import RiskManager
+from demo_trade import 
+DemoTradeEngine
 
 # ---------------------------------------
 # PAGE CONFIG
@@ -69,6 +71,10 @@ if "risk_manager" not in st.session_state:
     st.session_state.risk_manager = RiskManager()
 
 risk = st.session_state.risk_manager
+if "demo_trade_engine" not in st.session_state:
+    st.session_state.demo_trade_engine = DemoTradeEngine()
+
+demo_trader = st.session_state.demo_trade_engine
 
 # ---------------------------------------
 # HEADER
