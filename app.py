@@ -149,12 +149,18 @@ results = []
 
 for pair in pairs:
 
+    # Get market data
     if pair.startswith("BOOM") or pair.startswith("CRASH"):
         df = deriv.get_data(pair, timeframe)
     else:
         df = market.get_data(pair, timeframe)
 
-    if df is None:
+    # ---------------------------------------
+    # DATA VALIDATION
+    # ---------------------------------------
+
+    if df is None or not isinstance(df, pd.DataFrame) or df.empty:
+
         results.append({
             "Pair": pair,
             "Signal": "NO DATA",
@@ -162,12 +168,30 @@ for pair in pairs:
             "Status": "Unavailable",
             "Price": "-"
         })
+
         continue
 
-    # Calculate Indicators
-    df = indicator.calculate(df)
+    # Make sure required price column exists
+    if "Close" not in df.columns:
 
-    if df.empty:
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Missing Close Price",
+            "Price": "-"
+        })
+
+        continue
+
+    # ---------------------------------------
+    # CALCULATE INDICATORS
+    # ---------------------------------------
+
+    try:
+        df = indicator.calculate(df)
+    except Exception:
+
         results.append({
             "Pair": pair,
             "Signal": "NO DATA",
@@ -175,6 +199,19 @@ for pair in pairs:
             "Status": "Indicator Error",
             "Price": "-"
         })
+
+        continue
+
+    if df is None or not isinstance(df, pd.DataFrame) or df.empty:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Indicator Error",
+            "Price": "-"
+        })
+
         continue
 
     # ---------------------------------------
@@ -190,34 +227,117 @@ for pair in pairs:
 
     candle_minutes = timeframe_minutes.get(timeframe, 5)
 
+    # We need at least one valid candle
+    if len(df) < 1:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Not Enough Data",
+            "Price": "-"
+        })
+
+        continue
+
     latest = df.iloc[-1]
 
-    candle_start = pd.Timestamp(latest.name)
+    # ---------------------------------------
+    # VALIDATE CANDLE TIMESTAMP
+    # ---------------------------------------
+
+    try:
+
+        candle_start = pd.Timestamp(latest.name)
+
+        if pd.isna(candle_start):
+            raise ValueError("Invalid candle timestamp")
+
+    except Exception:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Invalid Candle Time",
+            "Price": "-"
+        })
+
+        continue
+
+    # ---------------------------------------
+    # CURRENT TIME
+    # ---------------------------------------
 
     if candle_start.tzinfo is not None:
-        current_time = pd.Timestamp.now(tz=candle_start.tz)
+
+        current_time = pd.Timestamp.now(
+            tz=candle_start.tz
+        )
+
     else:
+
         current_time = pd.Timestamp.now()
 
-    candle_close = candle_start + pd.Timedelta(
-        minutes=candle_minutes
+    # Current candle close time
+    candle_close = (
+        candle_start +
+        pd.Timedelta(minutes=candle_minutes)
     )
 
     # ---------------------------------------
     # USE COMPLETED CANDLE ONLY
     # ---------------------------------------
 
-    if current_time < candle_close and len(df) >= 2:
+    if current_time < candle_close:
+
+        # Latest candle is still forming.
+        # Therefore use the previous completed candle.
+
+        if len(df) < 2:
+
+            results.append({
+                "Pair": pair,
+                "Signal": "WAIT",
+                "Confidence": 0,
+                "Status": "Waiting for Completed Candle",
+                "Price": "-"
+            })
+
+            continue
+
         last = df.iloc[-2]
+
     else:
+
+        # Latest candle has already closed.
         last = df.iloc[-1]
+
+    # ---------------------------------------
+    # VALIDATE COMPLETED CANDLE
+    # ---------------------------------------
+
+    if pd.isna(last["Close"]):
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Invalid Close Price",
+            "Price": "-"
+        })
+
+        continue
 
     # ---------------------------------------
     # CANDLE COUNTDOWN
     # ---------------------------------------
 
     remaining_seconds = max(
-        int((candle_close - current_time).total_seconds()),
+        int(
+            (candle_close - current_time)
+            .total_seconds()
+        ),
         0
     )
 
@@ -225,26 +345,76 @@ for pair in pairs:
     remaining_secs = remaining_seconds % 60
 
     candle_remaining = (
-        f"{remaining_minutes}m {remaining_secs}s"
+        f"{remaining_minutes}m "
+        f"{remaining_secs}s"
     )
 
     # ---------------------------------------
     # STRATEGY ANALYSIS
     # ---------------------------------------
 
-    analysis = strategy.analyze(last)
+    try:
+
+        analysis = strategy.analyze(last)
+
+    except Exception:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Strategy Error",
+            "Price": "-"
+        })
+
+        continue
 
     # ---------------------------------------
     # AI DECISION
     # ---------------------------------------
 
-    decision = ai.evaluate(analysis)
+    try:
+
+        decision = ai.evaluate(analysis)
+
+    except Exception:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "AI Error",
+            "Price": "-"
+        })
+
+        continue
 
     # ---------------------------------------
     # CURRENT PRICE
     # ---------------------------------------
 
-    price = round(float(last["Close"]), 5)
+    try:
+
+        price = round(
+            float(last["Close"]),
+            5
+        )
+
+    except Exception:
+
+        results.append({
+            "Pair": pair,
+            "Signal": "NO DATA",
+            "Confidence": 0,
+            "Status": "Invalid Price",
+            "Price": "-"
+        })
+
+        continue
+
+    # ---------------------------------------
+    # STORE RESULT
+    # ---------------------------------------
 
     results.append({
         "Pair": pair,
