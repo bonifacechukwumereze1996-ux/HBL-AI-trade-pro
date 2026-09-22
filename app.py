@@ -429,11 +429,11 @@ for pair in pairs:
         "Candle Remaining": candle_remaining
     })
 
-    # ---------------------------------------
+       # ---------------------------------------
     # TELEGRAM ALERT
     # ---------------------------------------
 
-        if decision["approved"]:
+    if decision["approved"]:
 
         # ---------------------------------------
         # OPEN DEMO TRADE
