@@ -472,10 +472,12 @@ for pair in pairs:
     # ---------------------------------------
  if decision["approved"]:
 
-        # ---------------------------------------
-        # CREATE PENDING DEMO TRADE
-        # WAIT FOR NEXT CANDLE
-        # ---------------------------------------
+            # ---------------------------------------
+    # CREATE PENDING DEMO TRADE
+    # WAIT FOR NEXT CANDLE
+    # ---------------------------------------
+
+    if decision["approved"]:
 
         if not demo_trader.has_pending_trade(pair):
 
