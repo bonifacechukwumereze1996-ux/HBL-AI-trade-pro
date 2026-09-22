@@ -28,7 +28,6 @@ from risk import RiskManager
 from demo_trade import 
 DemoTradeEngine
 
-
 # ---------------------------------------
 # PAGE CONFIG
 # ---------------------------------------
