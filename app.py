@@ -468,11 +468,6 @@ for pair in pairs:
     })
 
        # ---------------------------------------
-    # TELEGRAM ALERT
-    # ---------------------------------------
- if decision["approved"]:
-
-            # ---------------------------------------
     # CREATE PENDING DEMO TRADE
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
