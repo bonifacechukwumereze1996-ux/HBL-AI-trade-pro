@@ -513,6 +513,83 @@ for pair in pairs:
 
                 st.session_state.last_signal[pair] = decision["signal"]
 # ---------------------------------------
+# DEMO TRADE PERFORMANCE
+# ---------------------------------------
+
+open_demo_trades = demo_trader.get_open_trades()
+
+completed_demo_trades = (
+    demo_trader.get_completed_trades()
+)
+
+demo_wins = sum(
+    1
+    for trade in completed_demo_trades
+    if trade["result"] == "WIN"
+)
+
+demo_losses = sum(
+    1
+    for trade in completed_demo_trades
+    if trade["result"] == "LOSS"
+)
+
+demo_draws = sum(
+    1
+    for trade in completed_demo_trades
+    if trade["result"] == "DRAW"
+)
+
+total_completed = len(
+    completed_demo_trades
+)
+
+if total_completed > 0:
+
+    demo_win_rate = (
+        demo_wins / total_completed
+    ) * 100
+
+else:
+
+    demo_win_rate = 0
+
+st.subheader("📊 Demo Trade Performance")
+
+col1, col2, col3, col4, col5, col6 = st.columns(6)
+
+col1.metric(
+    "Open",
+    len(open_demo_trades)
+)
+
+col2.metric(
+    "Completed",
+    total_completed
+)
+
+col3.metric(
+    "Wins",
+    demo_wins
+)
+
+col4.metric(
+    "Losses",
+    demo_losses
+)
+
+col5.metric(
+    "Draws",
+    demo_draws
+)
+
+col6.metric(
+    "Win Rate",
+    f"{demo_win_rate:.1f}%"
+)
+
+st.divider()
+# ---------------------------------------
 # RESULTS DATAFRAME
 # ---------------------------------------
 
