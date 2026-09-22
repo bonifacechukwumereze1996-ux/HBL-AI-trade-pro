@@ -17,7 +17,6 @@ from config import (
     DEFAULT_TIMEFRAME,
     AUTO_REFRESH,
 )
-
 from data import MarketData
 from deriv_data import DerivMarketData
 from indicators import IndicatorEngine
@@ -28,6 +27,7 @@ from history import TradeHistory
 from risk import RiskManager
 from demo_trade import 
 DemoTradeEngine
+
 
 # ---------------------------------------
 # PAGE CONFIG
