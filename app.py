@@ -73,6 +73,10 @@ if "demo_trade_engine" not in st.session_state:
     st.session_state.demo_trade_engine = DemoTradeEngine()
 
 demo_trader = st.session_state.demo_trade_engine
+if "demo_trade_candles" not in st.session_state:
+    st.session_state.demo_trade_candles = {}
+
+demo_trade_candles = st.session_state.demo_trade_candles
 
 # ---------------------------------------
 # HEADER
