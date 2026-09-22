@@ -470,8 +470,7 @@ for pair in pairs:
        # ---------------------------------------
     # TELEGRAM ALERT
     # ---------------------------------------
-
-        if decision["approved"]:
+ if decision["approved"]:
 
         # ---------------------------------------
         # CREATE PENDING DEMO TRADE
