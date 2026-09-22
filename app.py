@@ -25,8 +25,7 @@ from ai_engine import AIEngine
 from notifier import Notifier
 from history import TradeHistory
 from risk import RiskManager
-from demo_trade import 
-DemoTradeEngine
+from demo_trade import DemoTradeEngine
 
 # ---------------------------------------
 # PAGE CONFIG
