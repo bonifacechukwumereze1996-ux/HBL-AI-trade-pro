@@ -471,34 +471,28 @@ for pair in pairs:
     # TELEGRAM ALERT
     # ---------------------------------------
 
-    if decision["approved"]:
+        if decision["approved"]:
 
         # ---------------------------------------
-        # OPEN DEMO TRADE
+        # CREATE PENDING DEMO TRADE
+        # WAIT FOR NEXT CANDLE
         # ---------------------------------------
 
-        if not demo_trader.has_open_trade(pair):
+        if not demo_trader.has_pending_trade(pair):
 
-            opened = demo_trader.open_trade(
+            pending = demo_trader.create_pending_trade(
                 pair=pair,
                 signal=decision["signal"],
                 confidence=decision["confidence"],
-                price=price,
+                signal_candle=str(last.name),
                 timeframe=timeframe
             )
 
-            if opened:
+            if pending:
 
-                message = notify.signal_message(
-                    pair=pair,
-                    signal=decision["signal"],
-                    confidence=decision["confidence"],
-                    price=price,
-                    timeframe=timeframe,
-                    reasons=decision["reasons"]
+                st.session_state.last_signal[pair] = (
+                    decision["signal"]
                 )
-
-                notify.send_telegram(message)
 
                 history.save(
                     pair=pair,
@@ -506,12 +500,8 @@ for pair in pairs:
                     confidence=decision["confidence"],
                     price=price,
                     timeframe=timeframe,
-                    status="DEMO OPEN"
+                    status="DEMO PENDING"
                 )
-
-                risk.register_trade()
-
-                st.session_state.last_signal[pair] = decision["signal"]
 # ---------------------------------------
 # DEMO TRADE PERFORMANCE
 # ---------------------------------------
