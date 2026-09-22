@@ -389,27 +389,7 @@ for pair in pairs:
                 )
 
                 demo_trade_candles[pair] = candle_id
-    # ---------------------------------------
-    # CLOSE EXISTING DEMO TRADE
-    # ---------------------------------------
-
-    if demo_trader.has_open_trade(pair):
-
-        completed_trade = demo_trader.close_trade(
-            pair=pair,
-            exit_price=round(float(last["Close"]), 5)
-        )
-
-        if completed_trade:
-
-            history.save(
-                pair=pair,
-                signal=completed_trade["signal"],
-                confidence=completed_trade["confidence"],
-                price=completed_trade["exit_price"],
-                timeframe=completed_trade["timeframe"],
-                status=f"DEMO {completed_trade['result']}"
-            )
+    
 
     # ---------------------------------------
     # STRATEGY ANALYSIS
