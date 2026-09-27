@@ -387,6 +387,51 @@ for pair in pairs:
 
                 demo_trade_candles[pair] = candle_id
     
+    # ---------------------------------------
+    # OPEN PENDING DEMO TRADE
+    # ON NEXT COMPLETED CANDLE
+    # ---------------------------------------
+
+    if demo_trader.has_pending_trade(pair):
+
+        pending_trade = demo_trader.pending_trades.get(pair)
+
+        if pending_trade:
+
+            signal_candle = str(
+                pending_trade["signal_candle"]
+            )
+
+            current_candle = str(
+                last.name
+            )
+
+            if current_candle != signal_candle:
+
+                opened = demo_trader.open_pending_trade(
+                    pair=pair,
+                    entry_price=float(last["Close"]),
+                    entry_candle=current_candle
+                )
+
+                if opened:
+
+                    open_trade = demo_trader.open_trades.get(pair)
+
+                    if open_trade:
+
+                        history.save(
+                            pair=pair,
+                            signal=open_trade["signal"],
+                            confidence=open_trade["confidence"],
+                            price=open_trade["entry_price"],
+                            timeframe=open_trade["timeframe"],
+                            status="DEMO OPEN"
+                        )
+
+                        risk.register_trade()
+
+                        demo_trade_candles[pair] = current_candle
 
     # ---------------------------------------
     # STRATEGY ANALYSIS
