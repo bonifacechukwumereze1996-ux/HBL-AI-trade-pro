@@ -370,12 +370,9 @@ for pair in pairs:
         if previous_candle != candle_id:
 
             completed_trade = demo_trader.close_trade(
-                pair=pair,
-                exit_price=round(
-                    float(last["Close"]),
-                    5
-                )
-            )
+    pair=pair,
+    exit_price=float(last["Close"])
+)
 
             if completed_trade:
 
