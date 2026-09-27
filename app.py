@@ -362,14 +362,14 @@ for pair in pairs:
     # ---------------------------------------
 
     candle_id = str(last.name)
-st.write(
+    st.write(
     "DEBUG",
     pair,
     "Candle:",
     candle_id,
     "Pending:",
     demo_trader.has_pending_trade(pair)
-)
+    )
 
     if demo_trader.has_open_trade(pair):
 
