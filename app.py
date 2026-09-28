@@ -384,17 +384,42 @@ for pair in pairs:
 
             if completed_trade:
 
-                history.save(
-                    pair=pair,
-                    signal=completed_trade["signal"],
-                    confidence=completed_trade["confidence"],
-                    price=completed_trade["exit_price"],
-                    timeframe=completed_trade["timeframe"],
-                    status=f"DEMO {completed_trade['result']}"
-                )
+    history.save(
+        pair=pair,
+        signal=completed_trade["signal"],
+        confidence=completed_trade["confidence"],
+        price=completed_trade["exit_price"],
+        timeframe=completed_trade["timeframe"],
+        status=f"DEMO {completed_trade['result']}"
+    )
 
-                demo_trade_candles[pair] = candle_id
-    
+    # ---------------------------------------
+    # UPDATE RISK AFTER DEMO LOSS
+    # ---------------------------------------
+
+    if completed_trade["result"] == "LOSS":
+
+        entry_price = float(
+            completed_trade["entry_price"]
+        )
+
+        exit_price = float(
+            completed_trade["exit_price"]
+        )
+
+        if entry_price > 0:
+
+            loss_percent = (
+                abs(
+                    (exit_price - entry_price)
+                    / entry_price
+                )
+                * 100
+            )
+
+            risk.add_loss(loss_percent)
+
+    demo_trade_candles[pair] = candle_id
     # ---------------------------------------
     # OPEN PENDING DEMO TRADE
     # ON NEXT COMPLETED CANDLE
