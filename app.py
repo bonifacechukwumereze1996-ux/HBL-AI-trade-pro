@@ -397,29 +397,40 @@ for pair in pairs:
     # UPDATE RISK AFTER DEMO LOSS
     # ---------------------------------------
 
-    if completed_trade["result"] == "LOSS":
+               if completed_trade:
 
-        entry_price = float(
-            completed_trade["entry_price"]
-        )
-
-        exit_price = float(
-            completed_trade["exit_price"]
-        )
-
-        if entry_price > 0:
-
-            loss_percent = (
-                abs(
-                    (exit_price - entry_price)
-                    / entry_price
+                history.save(
+                    pair=pair,
+                    signal=completed_trade["signal"],
+                    confidence=completed_trade["confidence"],
+                    price=completed_trade["exit_price"],
+                    timeframe=completed_trade["timeframe"],
+                    status=f"DEMO {completed_trade['result']}"
                 )
-                * 100
-            )
 
-            risk.add_loss(loss_percent)
+                if completed_trade["result"] == "LOSS":
 
-    demo_trade_candles[pair] = candle_id
+                    entry_price = float(
+                        completed_trade["entry_price"]
+                    )
+
+                    exit_price = float(
+                        completed_trade["exit_price"]
+                    )
+
+                    if entry_price > 0:
+
+                        loss_percent = (
+                            abs(
+                                (exit_price - entry_price)
+                                / entry_price
+                            )
+                            * 100
+                        )
+
+                        risk.add_loss(loss_percent)
+
+                demo_trade_candles[pair] = candle_id
     # ---------------------------------------
     # OPEN PENDING DEMO TRADE
     # ON NEXT COMPLETED CANDLE
