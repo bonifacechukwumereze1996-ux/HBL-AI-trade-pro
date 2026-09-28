@@ -397,7 +397,7 @@ for pair in pairs:
     # UPDATE RISK AFTER DEMO LOSS
     # ---------------------------------------
 
-               if completed_trade:
+             if completed_trade:
 
                 history.save(
                     pair=pair,
