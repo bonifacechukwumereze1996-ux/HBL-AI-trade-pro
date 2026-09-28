@@ -547,7 +547,7 @@ for pair in pairs:
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
 
-    if decision["approved"]:
+    if decision["approved"] and risk.can_trade():
 
         if not demo_trader.has_pending_trade(pair):
 
