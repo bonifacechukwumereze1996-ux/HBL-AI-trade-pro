@@ -356,20 +356,12 @@ for pair in pairs:
         f"{remaining_minutes}m "
         f"{remaining_secs}s"
     )
-    # ---------------------------------------
+        # ---------------------------------------
     # CLOSE EXISTING DEMO TRADE
     # ONCE PER COMPLETED CANDLE
     # ---------------------------------------
 
     candle_id = str(last.name)
-    st.write(
-    "DEBUG",
-    pair,
-    "Candle:",
-    candle_id,
-    "Pending:",
-    demo_trader.has_pending_trade(pair)
-    )
 
     if demo_trader.has_open_trade(pair):
 
@@ -378,26 +370,11 @@ for pair in pairs:
         if previous_candle != candle_id:
 
             completed_trade = demo_trader.close_trade(
-    pair=pair,
-    exit_price=float(last["Close"])
-)
+                pair=pair,
+                exit_price=float(last["Close"])
+            )
 
             if completed_trade:
-
-    history.save(
-        pair=pair,
-        signal=completed_trade["signal"],
-        confidence=completed_trade["confidence"],
-        price=completed_trade["exit_price"],
-        timeframe=completed_trade["timeframe"],
-        status=f"DEMO {completed_trade['result']}"
-    )
-
-    # ---------------------------------------
-    # UPDATE RISK AFTER DEMO LOSS
-    # ---------------------------------------
-
-             if completed_trade:
 
                 history.save(
                     pair=pair,
@@ -407,6 +384,10 @@ for pair in pairs:
                     timeframe=completed_trade["timeframe"],
                     status=f"DEMO {completed_trade['result']}"
                 )
+
+                # ---------------------------------------
+                # UPDATE RISK AFTER DEMO LOSS
+                # ---------------------------------------
 
                 if completed_trade["result"] == "LOSS":
 
