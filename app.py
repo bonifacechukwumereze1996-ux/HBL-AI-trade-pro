@@ -640,6 +640,46 @@ col6.metric(
     "Win Rate",
     f"{demo_win_rate:.1f}%"
 )
+# ---------------------------------------
+# COMPLETED DEMO TRADE DETAILS
+# ---------------------------------------
+
+st.subheader("🔎 Completed Demo Trade Details")
+
+if completed_demo_trades:
+
+    completed_df = pd.DataFrame(
+        completed_demo_trades
+    )
+
+    display_columns = [
+        "pair",
+        "signal",
+        "confidence",
+        "entry_price",
+        "exit_price",
+        "result",
+        "price_change",
+        "signal_candle",
+        "entry_candle",
+        "timeframe"
+    ]
+
+    available_columns = [
+        column
+        for column in display_columns
+        if column in completed_df.columns
+    ]
+
+    st.dataframe(
+        completed_df[available_columns],
+        use_container_width=True,
+        hide_index=True
+    )
+
+else:
+
+    st.info("No completed demo trades yet.")
 
 st.divider()
 # ---------------------------------------
