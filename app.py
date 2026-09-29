@@ -1,6 +1,6 @@
 """
 =========================================
-HBL AI Trader Pro v3.0
+HBL AI TRADER PRO v3.0
 Main Application
 =========================================
 """
@@ -69,10 +69,12 @@ if "risk_manager" not in st.session_state:
     st.session_state.risk_manager = RiskManager()
 
 risk = st.session_state.risk_manager
+
 if "demo_trade_engine" not in st.session_state:
     st.session_state.demo_trade_engine = DemoTradeEngine()
 
 demo_trader = st.session_state.demo_trade_engine
+
 if "demo_trade_candles" not in st.session_state:
     st.session_state.demo_trade_candles = {}
 
@@ -151,6 +153,7 @@ st.divider()
 # ---------------------------------------
 
 results = []
+
 # ---------------------------------------
 # ANALYZE EACH PAIR
 # ---------------------------------------
@@ -198,6 +201,7 @@ for pair in pairs:
 
     try:
         df = indicator.calculate(df)
+
     except Exception:
 
         results.append({
@@ -240,7 +244,7 @@ for pair in pairs:
 
         results.append({
             "Pair": pair,
-            "Signal": "NO DATA",
+            "Signal": "WAIT",
             "Confidence": 0,
             "Status": "Not Enough Data",
             "Price": "-"
@@ -356,7 +360,8 @@ for pair in pairs:
         f"{remaining_minutes}m "
         f"{remaining_secs}s"
     )
-        # ---------------------------------------
+
+    # ---------------------------------------
     # CLOSE EXISTING DEMO TRADE
     # ONCE PER COMPLETED CANDLE
     # ---------------------------------------
@@ -412,6 +417,7 @@ for pair in pairs:
                         risk.add_loss(loss_percent)
 
                 demo_trade_candles[pair] = candle_id
+
     # ---------------------------------------
     # OPEN PENDING DEMO TRADE
     # ON NEXT COMPLETED CANDLE
@@ -521,7 +527,7 @@ for pair in pairs:
 
         continue
 
-        # ---------------------------------------
+    # ---------------------------------------
     # STORE RESULT
     # ---------------------------------------
 
@@ -543,22 +549,13 @@ for pair in pairs:
 
         if not demo_trader.has_pending_trade(pair):
 
-            indicator_snapshot = {
-                "EMA10": round(float(last["EMA10"]), 5),
-                "EMA25": round(float(last["EMA25"]), 5),
-                "RSI": round(float(last["RSI"]), 2),
-                "MACD": round(float(last["MACD"]), 6),
-                "MACD_SIGNAL": round(float(last["MACD_SIGNAL"]), 6),
-                "ADX": round(float(last["ADX"]), 2)
-            }
-
-   pending = demo_trader.create_pending_trade(
-    pair=pair,
-    signal=decision["signal"],
-    confidence=decision["confidence"],
-    signal_candle=str(last.name),
-    timeframe=timeframe
-)
+            pending = demo_trader.create_pending_trade(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                signal_candle=str(last.name),
+                timeframe=timeframe
+            )
 
             if pending:
 
@@ -574,6 +571,7 @@ for pair in pairs:
                     timeframe=timeframe,
                     status="DEMO PENDING"
                 )
+
 # ---------------------------------------
 # DEMO TRADE PERFORMANCE
 # ---------------------------------------
@@ -649,6 +647,7 @@ col6.metric(
     "Win Rate",
     f"{demo_win_rate:.1f}%"
 )
+
 # ---------------------------------------
 # COMPLETED DEMO TRADE DETAILS
 # ---------------------------------------
@@ -691,6 +690,7 @@ else:
     st.info("No completed demo trades yet.")
 
 st.divider()
+
 # ---------------------------------------
 # RESULTS DATAFRAME
 # ---------------------------------------
@@ -747,6 +747,7 @@ else:
         use_container_width=True,
         hide_index=True
     )
+
 # ---------------------------------------
 # LIVE CHARTS
 # ---------------------------------------
@@ -811,4 +812,3 @@ st.caption(
     "Educational Purposes Only | "
     "Powered by Python, Streamlit & Yahoo Finance"
 )
-
