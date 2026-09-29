@@ -521,7 +521,7 @@ for pair in pairs:
 
         continue
 
-    # ---------------------------------------
+        # ---------------------------------------
     # STORE RESULT
     # ---------------------------------------
 
@@ -534,12 +534,12 @@ for pair in pairs:
         "Candle Remaining": candle_remaining
     })
 
-       # ---------------------------------------
+    # ---------------------------------------
     # CREATE PENDING DEMO TRADE
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
 
-        if decision["approved"] and risk.can_trade():
+    if decision["approved"] and risk.can_trade():
 
         if not demo_trader.has_pending_trade(pair):
 
