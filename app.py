@@ -552,14 +552,13 @@ for pair in pairs:
                 "ADX": round(float(last["ADX"]), 2)
             }
 
-            pending = demo_trader.create_pending_trade(
-                pair=pair,
-                signal=decision["signal"],
-                confidence=decision["confidence"],
-                signal_candle=str(last.name),
-                timeframe=timeframe,
-                indicators=indicator_snapshot
-            )
+   pending = demo_trader.create_pending_trade(
+    pair=pair,
+    signal=decision["signal"],
+    confidence=decision["confidence"],
+    signal_candle=str(last.name),
+    timeframe=timeframe
+)
 
             if pending:
 
