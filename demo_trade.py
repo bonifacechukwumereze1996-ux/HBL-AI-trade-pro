@@ -36,7 +36,8 @@ class DemoTradeEngine:
         signal,
         confidence,
         signal_candle,
-        timeframe
+        timeframe,
+        indicators=None
     ):
 
         if self.has_pending_trade(pair):
@@ -54,7 +55,8 @@ class DemoTradeEngine:
             "confidence": confidence,
             "signal_candle": signal_candle,
             "created_time": datetime.now(),
-            "timeframe": timeframe
+            "timeframe": timeframe,
+            "indicators": indicators.copy() if indicators else {}
         }
 
         self.pending_trades[pair] = trade
@@ -102,7 +104,11 @@ class DemoTradeEngine:
             "entry_time": datetime.now(),
             "entry_candle": entry_candle,
             "signal_candle": trade["signal_candle"],
-            "timeframe": trade["timeframe"]
+            "timeframe": trade["timeframe"],
+            "indicators": trade.get(
+                "indicators",
+                {}
+            )
         }
 
         self.open_trades[pair] = open_trade
@@ -178,6 +184,10 @@ class DemoTradeEngine:
             "price_change": round(
                 price_change,
                 5
+            ),
+            "indicators": trade.get(
+                "indicators",
+                {}
             )
         }
 
