@@ -539,11 +539,11 @@ for pair in pairs:
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
 
-    if decision["approved"] and risk.can_trade():
+        if decision["approved"] and risk.can_trade():
 
         if not demo_trader.has_pending_trade(pair):
 
-                        indicator_snapshot = {
+            indicator_snapshot = {
                 "EMA10": round(float(last["EMA10"]), 5),
                 "EMA25": round(float(last["EMA25"]), 5),
                 "RSI": round(float(last["RSI"]), 2),
@@ -568,7 +568,7 @@ for pair in pairs:
                 )
 
                 history.save(
-  pair=pair,
+                    pair=pair,
                     signal=decision["signal"],
                     confidence=decision["confidence"],
                     price=price,
