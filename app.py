@@ -543,23 +543,23 @@ for pair in pairs:
 
         if not demo_trader.has_pending_trade(pair):
 
-            indicator_snapshot = {
-    "EMA10": round(float(last["EMA10"]), 5),
-    "EMA25": round(float(last["EMA25"]), 5),
-    "RSI": round(float(last["RSI"]), 2),
-    "MACD": round(float(last["MACD"]), 6),
-    "MACD_SIGNAL": round(float(last["MACD_SIGNAL"]), 6),
-    "ADX": round(float(last["ADX"]), 2)
-}
+                        indicator_snapshot = {
+                "EMA10": round(float(last["EMA10"]), 5),
+                "EMA25": round(float(last["EMA25"]), 5),
+                "RSI": round(float(last["RSI"]), 2),
+                "MACD": round(float(last["MACD"]), 6),
+                "MACD_SIGNAL": round(float(last["MACD_SIGNAL"]), 6),
+                "ADX": round(float(last["ADX"]), 2)
+            }
 
-pending = demo_trader.create_pending_trade(
-    pair=pair,
-    signal=decision["signal"],
-    confidence=decision["confidence"],
-    signal_candle=str(last.name),
-    timeframe=timeframe,
-    indicators=indicator_snapshot
-)
+            pending = demo_trader.create_pending_trade(
+                pair=pair,
+                signal=decision["signal"],
+                confidence=decision["confidence"],
+                signal_candle=str(last.name),
+                timeframe=timeframe,
+                indicators=indicator_snapshot
+            )
 
             if pending:
 
@@ -568,7 +568,7 @@ pending = demo_trader.create_pending_trade(
                 )
 
                 history.save(
-                    pair=pair,
+  pair=pair,
                     signal=decision["signal"],
                     confidence=decision["confidence"],
                     price=price,
