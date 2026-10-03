@@ -1,29 +1,134 @@
+
 """
 =========================================
 HBL AI TRADER PRO v3.0
-Demo Trade Engine
+Persistent Demo Trade Engine
 =========================================
 """
 
+import json
+import os
 from datetime import datetime
 
 
 class DemoTradeEngine:
 
-    def __init__(self):
+    def __init__(self, file_path="demo_state.json"):
+
+        self.file_path = file_path
 
         self.pending_trades = {}
-
         self.open_trades = {}
-
         self.completed_trades = []
+
+        self.load_state()
+
+    # ---------------------------------------
+    # CONVERT DATETIME FOR JSON
+    # ---------------------------------------
+
+    def serialize_trade(self, trade):
+
+        saved = trade.copy()
+
+        for key, value in saved.items():
+            if isinstance(value, datetime):
+                saved[key] = value.isoformat()
+
+        return saved
+
+    # ---------------------------------------
+    # RESTORE DATETIME VALUES
+    # ---------------------------------------
+
+    def restore_trade(self, trade):
+
+        restored = trade.copy()
+
+        datetime_fields = [
+            "created_time",
+            "entry_time",
+            "exit_time"
+        ]
+
+        for key in datetime_fields:
+            value = restored.get(key)
+
+            if isinstance(value, str):
+                restored[key] = datetime.fromisoformat(value)
+
+        return restored
+
+    # ---------------------------------------
+    # SAVE CURRENT STATE
+    # ---------------------------------------
+
+    def save_state(self):
+
+        data = {
+            "pending_trades": {
+                pair: self.serialize_trade(trade)
+                for pair, trade in self.pending_trades.items()
+            },
+            "open_trades": {
+                pair: self.serialize_trade(trade)
+                for pair, trade in self.open_trades.items()
+            },
+            "completed_trades": [
+                self.serialize_trade(trade)
+                for trade in self.completed_trades
+            ]
+        }
+
+        temp_path = self.file_path + ".tmp"
+
+        with open(temp_path, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+
+        os.replace(temp_path, self.file_path)
+
+    # ---------------------------------------
+    # LOAD SAVED STATE
+    # ---------------------------------------
+
+    def load_state(self):
+
+        if not os.path.exists(self.file_path):
+            return
+
+        try:
+            with open(self.file_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+
+            self.pending_trades = {
+                pair: self.restore_trade(trade)
+                for pair, trade in data.get(
+                    "pending_trades", {}
+                ).items()
+            }
+
+            self.open_trades = {
+                pair: self.restore_trade(trade)
+                for pair, trade in data.get(
+                    "open_trades", {}
+                ).items()
+            }
+
+            self.completed_trades = [
+                self.restore_trade(trade)
+                for trade in data.get(
+                    "completed_trades", []
+                )
+            ]
+
+        except (OSError, ValueError, TypeError, KeyError) as error:
+            print("Could not load demo state:", error)
 
     # ---------------------------------------
     # CHECK PENDING TRADE
     # ---------------------------------------
 
     def has_pending_trade(self, pair):
-
         return pair in self.pending_trades
 
     # ---------------------------------------
@@ -60,6 +165,7 @@ class DemoTradeEngine:
         }
 
         self.pending_trades[pair] = trade
+        self.save_state()
 
         return True
 
@@ -68,12 +174,10 @@ class DemoTradeEngine:
     # ---------------------------------------
 
     def has_open_trade(self, pair):
-
         return pair in self.open_trades
 
     # ---------------------------------------
     # OPEN PENDING TRADE
-    # ON NEXT CANDLE
     # ---------------------------------------
 
     def open_pending_trade(
@@ -91,9 +195,7 @@ class DemoTradeEngine:
 
         trade = self.pending_trades[pair]
 
-        if str(entry_candle) == str(
-            trade["signal_candle"]
-        ):
+        if str(entry_candle) == str(trade["signal_candle"]):
             return False
 
         open_trade = {
@@ -105,15 +207,13 @@ class DemoTradeEngine:
             "entry_candle": entry_candle,
             "signal_candle": trade["signal_candle"],
             "timeframe": trade["timeframe"],
-            "indicators": trade.get(
-                "indicators",
-                {}
-            )
+            "indicators": trade.get("indicators", {})
         }
 
         self.open_trades[pair] = open_trade
-
         del self.pending_trades[pair]
+
+        self.save_state()
 
         return True
 
@@ -131,18 +231,12 @@ class DemoTradeEngine:
         entry_price = trade["entry_price"]
         signal = trade["signal"]
 
-        # ---------------------------------------
-        # DETERMINE RESULT
-        # ---------------------------------------
-
         if signal == "BUY":
 
             if exit_price > entry_price:
                 result = "WIN"
-
             elif exit_price < entry_price:
                 result = "LOSS"
-
             else:
                 result = "DRAW"
 
@@ -150,23 +244,14 @@ class DemoTradeEngine:
 
             if exit_price < entry_price:
                 result = "WIN"
-
             elif exit_price > entry_price:
                 result = "LOSS"
-
             else:
                 result = "DRAW"
 
-        # ---------------------------------------
-        # CALCULATE PRICE MOVEMENT
-        # ---------------------------------------
-
         if signal == "BUY":
-
             price_change = exit_price - entry_price
-
         else:
-
             price_change = entry_price - exit_price
 
         completed_trade = {
@@ -181,21 +266,14 @@ class DemoTradeEngine:
             "signal_candle": trade["signal_candle"],
             "timeframe": trade["timeframe"],
             "result": result,
-            "price_change": round(
-                price_change,
-                5
-            ),
-            "indicators": trade.get(
-                "indicators",
-                {}
-            )
+            "price_change": round(price_change, 5),
+            "indicators": trade.get("indicators", {})
         }
 
-        self.completed_trades.append(
-            completed_trade
-        )
-
+        self.completed_trades.append(completed_trade)
         del self.open_trades[pair]
+
+        self.save_state()
 
         return completed_trade
 
@@ -204,25 +282,18 @@ class DemoTradeEngine:
     # ---------------------------------------
 
     def get_pending_trades(self):
-
-        return list(
-            self.pending_trades.values()
-        )
+        return list(self.pending_trades.values())
 
     # ---------------------------------------
     # GET OPEN TRADES
     # ---------------------------------------
 
     def get_open_trades(self):
-
-        return list(
-            self.open_trades.values()
-        )
+        return list(self.open_trades.values())
 
     # ---------------------------------------
     # GET COMPLETED TRADES
     # ---------------------------------------
 
     def get_completed_trades(self):
-
         return self.completed_trades
