@@ -544,8 +544,19 @@ for pair in pairs:
     # CREATE PENDING DEMO TRADE
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
+if decision["approved"] and risk.can_trade():
 
-    if decision["approved"] and risk.can_trade():
+    signal_candle = str(last.name)
+
+    # ---------------------------------------
+    # PREVENT DUPLICATE SIGNALS
+    # ON THE SAME COMPLETED CANDLE
+    # ---------------------------------------
+
+    if not demo_trader.has_signal_for_candle(
+        pair,
+        signal_candle
+    ):
 
         if not demo_trader.has_pending_trade(pair):
 
@@ -553,11 +564,17 @@ for pair in pairs:
                 pair=pair,
                 signal=decision["signal"],
                 confidence=decision["confidence"],
-                signal_candle=str(last.name),
+                signal_candle=signal_candle,
                 timeframe=timeframe
             )
 
             if pending:
+
+                # Record this candle permanently
+                demo_trader.record_signal_candle(
+                    pair,
+                    signal_candle
+                )
 
                 st.session_state.last_signal[pair] = (
                     decision["signal"]
