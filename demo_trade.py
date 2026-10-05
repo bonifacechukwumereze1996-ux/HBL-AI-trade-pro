@@ -18,11 +18,11 @@ class DemoTradeEngine:
         self.file_path = file_path
 
         self.pending_trades = {}
-        self.open_trades = {}
-        self.completed_trades = []
+self.open_trades = {}
+self.completed_trades = []
+self.last_signal_candles = {}
 
-        self.load_state()
-
+self.load_state()
     # ---------------------------------------
     # CONVERT DATETIME FOR JSON
     # ---------------------------------------
@@ -66,19 +66,20 @@ class DemoTradeEngine:
     def save_state(self):
 
         data = {
-            "pending_trades": {
-                pair: self.serialize_trade(trade)
-                for pair, trade in self.pending_trades.items()
-            },
-            "open_trades": {
-                pair: self.serialize_trade(trade)
-                for pair, trade in self.open_trades.items()
-            },
-            "completed_trades": [
-                self.serialize_trade(trade)
-                for trade in self.completed_trades
-            ]
-        }
+    "pending_trades": {
+        pair: self.serialize_trade(trade)
+        for pair, trade in self.pending_trades.items()
+    },
+    "open_trades": {
+        pair: self.serialize_trade(trade)
+        for pair, trade in self.open_trades.items()
+    },
+    "completed_trades": [
+        self.serialize_trade(trade)
+        for trade in self.completed_trades
+    ],
+    "last_signal_candles": self.last_signal_candles
+} 
 
         temp_path = self.file_path + ".tmp"
 
@@ -99,6 +100,9 @@ class DemoTradeEngine:
         try:
             with open(self.file_path, "r", encoding="utf-8") as file:
                 data = json.load(file)
+self.last_signal_candles = data.get(
+    "last_signal_candles", {}
+)
 
             self.pending_trades = {
                 pair: self.restore_trade(trade)
