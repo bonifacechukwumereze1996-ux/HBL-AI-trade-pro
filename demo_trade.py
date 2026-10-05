@@ -1,4 +1,3 @@
-
 """
 =========================================
 HBL AI TRADER PRO v3.0
@@ -18,11 +17,12 @@ class DemoTradeEngine:
         self.file_path = file_path
 
         self.pending_trades = {}
-self.open_trades = {}
-self.completed_trades = []
-self.last_signal_candles = {}
+        self.open_trades = {}
+        self.completed_trades = []
+        self.last_signal_candles = {}
 
-self.load_state()
+        self.load_state()
+
     # ---------------------------------------
     # CONVERT DATETIME FOR JSON
     # ---------------------------------------
@@ -52,9 +52,11 @@ self.load_state()
         ]
 
         for key in datetime_fields:
+
             value = restored.get(key)
 
             if isinstance(value, str):
+
                 restored[key] = datetime.fromisoformat(value)
 
         return restored
@@ -66,27 +68,39 @@ self.load_state()
     def save_state(self):
 
         data = {
-    "pending_trades": {
-        pair: self.serialize_trade(trade)
-        for pair, trade in self.pending_trades.items()
-    },
-    "open_trades": {
-        pair: self.serialize_trade(trade)
-        for pair, trade in self.open_trades.items()
-    },
-    "completed_trades": [
-        self.serialize_trade(trade)
-        for trade in self.completed_trades
-    ],
-    "last_signal_candles": self.last_signal_candles
-} 
+            "pending_trades": {
+                pair: self.serialize_trade(trade)
+                for pair, trade in self.pending_trades.items()
+            },
+            "open_trades": {
+                pair: self.serialize_trade(trade)
+                for pair, trade in self.open_trades.items()
+            },
+            "completed_trades": [
+                self.serialize_trade(trade)
+                for trade in self.completed_trades
+            ],
+            "last_signal_candles": self.last_signal_candles
+        }
 
         temp_path = self.file_path + ".tmp"
 
-        with open(temp_path, "w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4)
+        with open(
+            temp_path,
+            "w",
+            encoding="utf-8"
+        ) as file:
 
-        os.replace(temp_path, self.file_path)
+            json.dump(
+                data,
+                file,
+                indent=4
+            )
+
+        os.replace(
+            temp_path,
+            self.file_path
+        )
 
     # ---------------------------------------
     # LOAD SAVED STATE
@@ -98,41 +112,62 @@ self.load_state()
             return
 
         try:
-            with open(self.file_path, "r", encoding="utf-8") as file:
+
+            with open(
+                self.file_path,
+                "r",
+                encoding="utf-8"
+            ) as file:
+
                 data = json.load(file)
-self.last_signal_candles = data.get(
-    "last_signal_candles", {}
-)
+
+            self.last_signal_candles = data.get(
+                "last_signal_candles",
+                {}
+            )
 
             self.pending_trades = {
                 pair: self.restore_trade(trade)
                 for pair, trade in data.get(
-                    "pending_trades", {}
+                    "pending_trades",
+                    {}
                 ).items()
             }
 
             self.open_trades = {
                 pair: self.restore_trade(trade)
                 for pair, trade in data.get(
-                    "open_trades", {}
+                    "open_trades",
+                    {}
                 ).items()
             }
 
             self.completed_trades = [
                 self.restore_trade(trade)
                 for trade in data.get(
-                    "completed_trades", []
+                    "completed_trades",
+                    []
                 )
             ]
 
-        except (OSError, ValueError, TypeError, KeyError) as error:
-            print("Could not load demo state:", error)
+        except (
+            OSError,
+            ValueError,
+            TypeError,
+            KeyError
+        ) as error:
+
+            print(
+                "Could not load demo state:",
+                error
+            )
 
     # ---------------------------------------
     # CHECK PENDING TRADE
     # ---------------------------------------
 
     def has_pending_trade(self, pair):
+
         return pair in self.pending_trades
 
     # ---------------------------------------
@@ -165,10 +200,15 @@ self.last_signal_candles = data.get(
             "signal_candle": signal_candle,
             "created_time": datetime.now(),
             "timeframe": timeframe,
-            "indicators": indicators.copy() if indicators else {}
+            "indicators": (
+                indicators.copy()
+                if indicators
+                else {}
+            )
         }
 
         self.pending_trades[pair] = trade
+
         self.save_state()
 
         return True
@@ -178,6 +218,7 @@ self.last_signal_candles = data.get(
     # ---------------------------------------
 
     def has_open_trade(self, pair):
+
         return pair in self.open_trades
 
     # ---------------------------------------
@@ -199,7 +240,9 @@ self.last_signal_candles = data.get(
 
         trade = self.pending_trades[pair]
 
-        if str(entry_candle) == str(trade["signal_candle"]):
+        if str(entry_candle) == str(
+            trade["signal_candle"]
+        ):
             return False
 
         open_trade = {
@@ -211,10 +254,14 @@ self.last_signal_candles = data.get(
             "entry_candle": entry_candle,
             "signal_candle": trade["signal_candle"],
             "timeframe": trade["timeframe"],
-            "indicators": trade.get("indicators", {})
+            "indicators": trade.get(
+                "indicators",
+                {}
+            )
         }
 
         self.open_trades[pair] = open_trade
+
         del self.pending_trades[pair]
 
         self.save_state()
@@ -225,7 +272,11 @@ self.last_signal_candles = data.get(
     # CLOSE DEMO TRADE
     # ---------------------------------------
 
-    def close_trade(self, pair, exit_price):
+    def close_trade(
+        self,
+        pair,
+        exit_price
+    ):
 
         if not self.has_open_trade(pair):
             return None
@@ -239,8 +290,10 @@ self.last_signal_candles = data.get(
 
             if exit_price > entry_price:
                 result = "WIN"
+
             elif exit_price < entry_price:
                 result = "LOSS"
+
             else:
                 result = "DRAW"
 
@@ -248,15 +301,24 @@ self.last_signal_candles = data.get(
 
             if exit_price < entry_price:
                 result = "WIN"
+
             elif exit_price > entry_price:
                 result = "LOSS"
+
             else:
                 result = "DRAW"
 
         if signal == "BUY":
-            price_change = exit_price - entry_price
+
+            price_change = (
+                exit_price - entry_price
+            )
+
         else:
-            price_change = entry_price - exit_price
+
+            price_change = (
+                entry_price - exit_price
+            )
 
         completed_trade = {
             "pair": pair,
@@ -270,11 +332,20 @@ self.last_signal_candles = data.get(
             "signal_candle": trade["signal_candle"],
             "timeframe": trade["timeframe"],
             "result": result,
-            "price_change": round(price_change, 5),
-            "indicators": trade.get("indicators", {})
+            "price_change": round(
+                price_change,
+                5
+            ),
+            "indicators": trade.get(
+                "indicators",
+                {}
+            )
         }
 
-        self.completed_trades.append(completed_trade)
+        self.completed_trades.append(
+            completed_trade
+        )
+
         del self.open_trades[pair]
 
         self.save_state()
@@ -286,26 +357,38 @@ self.last_signal_candles = data.get(
     # ---------------------------------------
 
     def get_pending_trades(self):
-        return list(self.pending_trades.values())
+
+        return list(
+            self.pending_trades.values()
+        )
 
     # ---------------------------------------
     # GET OPEN TRADES
     # ---------------------------------------
 
     def get_open_trades(self):
-        return list(self.open_trades.values())
+
+        return list(
+            self.open_trades.values()
+        )
 
     # ---------------------------------------
     # GET COMPLETED TRADES
     # ---------------------------------------
 
     def get_completed_trades(self):
+
         return self.completed_trades
+
     # ---------------------------------------
     # CHECK SIGNAL FOR COMPLETED CANDLE
     # ---------------------------------------
 
-    def has_signal_for_candle(self, pair, candle_id):
+    def has_signal_for_candle(
+        self,
+        pair,
+        candle_id
+    ):
 
         return (
             self.last_signal_candles.get(pair)
@@ -316,8 +399,14 @@ self.last_signal_candles = data.get(
     # RECORD SIGNAL CANDLE
     # ---------------------------------------
 
-    def record_signal_candle(self, pair, candle_id):
+    def record_signal_candle(
+        self,
+        pair,
+        candle_id
+    ):
 
-        self.last_signal_candles[pair] = str(candle_id)
+        self.last_signal_candles[pair] = str(
+            candle_id
+        )
 
         self.save_state()
