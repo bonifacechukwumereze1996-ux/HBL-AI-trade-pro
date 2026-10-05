@@ -301,3 +301,23 @@ self.last_signal_candles = data.get(
 
     def get_completed_trades(self):
         return self.completed_trades
+    # ---------------------------------------
+    # CHECK SIGNAL FOR COMPLETED CANDLE
+    # ---------------------------------------
+
+    def has_signal_for_candle(self, pair, candle_id):
+
+        return (
+            self.last_signal_candles.get(pair)
+            == str(candle_id)
+        )
+
+    # ---------------------------------------
+    # RECORD SIGNAL CANDLE
+    # ---------------------------------------
+
+    def record_signal_candle(self, pair, candle_id):
+
+        self.last_signal_candles[pair] = str(candle_id)
+
+        self.save_state()
