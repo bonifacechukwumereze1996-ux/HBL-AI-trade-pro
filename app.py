@@ -546,7 +546,7 @@ for pair in pairs:
     # ---------------------------------------
     if decision["approved"] and risk.can_trade():
 
-    signal_candle = str(last.name)
+        signal_candle = str(last.name)
 
     # ---------------------------------------
     # PREVENT DUPLICATE SIGNALS
