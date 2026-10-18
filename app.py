@@ -544,7 +544,7 @@ for pair in pairs:
     # CREATE PENDING DEMO TRADE
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
-if decision["approved"] and risk.can_trade():
+    if decision["approved"] and risk.can_trade():
 
     signal_candle = str(last.name)
 
