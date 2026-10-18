@@ -540,54 +540,57 @@ for pair in pairs:
         "Candle Remaining": candle_remaining
     })
 
+    
     # ---------------------------------------
     # CREATE PENDING DEMO TRADE
     # WAIT FOR NEXT CANDLE
     # ---------------------------------------
+
     if decision["approved"] and risk.can_trade():
 
         signal_candle = str(last.name)
 
-    # ---------------------------------------
-    # PREVENT DUPLICATE SIGNALS
-    # ON THE SAME COMPLETED CANDLE
-    # ---------------------------------------
+        # ---------------------------------------
+        # PREVENT DUPLICATE SIGNALS
+        # ON THE SAME COMPLETED CANDLE
+        # ---------------------------------------
 
-    if not demo_trader.has_signal_for_candle(
-        pair,
-        signal_candle
-    ):
+        if not demo_trader.has_signal_for_candle(
+            pair,
+            signal_candle
+        ):
 
-        if not demo_trader.has_pending_trade(pair):
+            if not demo_trader.has_pending_trade(pair):
 
-            pending = demo_trader.create_pending_trade(
-                pair=pair,
-                signal=decision["signal"],
-                confidence=decision["confidence"],
-                signal_candle=signal_candle,
-                timeframe=timeframe
-            )
-
-            if pending:
-
-                # Record this candle permanently
-                demo_trader.record_signal_candle(
-                    pair,
-                    signal_candle
-                )
-
-                st.session_state.last_signal[pair] = (
-                    decision["signal"]
-                )
-
-                history.save(
+                pending = demo_trader.create_pending_trade(
                     pair=pair,
                     signal=decision["signal"],
                     confidence=decision["confidence"],
-                    price=price,
-                    timeframe=timeframe,
-                    status="DEMO PENDING"
+                    signal_candle=signal_candle,
+                    timeframe=timeframe
                 )
+
+                if pending:
+
+                    # Record this candle permanently
+                    demo_trader.record_signal_candle(
+                        pair,
+                        signal_candle
+                    )
+
+                    st.session_state.last_signal[pair] = (
+                        decision["signal"]
+                    )
+
+                    history.save(
+                        pair=pair,
+                        signal=decision["signal"],
+                        confidence=decision["confidence"],
+                        price=price,
+                        timeframe=timeframe,
+                        status="DEMO PENDING"
+                    )
+
 
 # ---------------------------------------
 # DEMO TRADE PERFORMANCE
