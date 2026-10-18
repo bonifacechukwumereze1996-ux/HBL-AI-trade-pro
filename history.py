@@ -1,6 +1,7 @@
+
 """
 =========================================
-HBL AI TRADER PRO v2.0
+HBL AI TRADER PRO v3.0
 Trade History Module
 =========================================
 """
@@ -13,7 +14,6 @@ from datetime import datetime
 class TradeHistory:
 
     def __init__(self):
-
         self.file_path = "trade_history.csv"
         self.columns = [
             "Date",
@@ -25,19 +25,28 @@ class TradeHistory:
             "Timeframe",
             "Status"
         ]
-
         self.create_file()
 
     def create_file(self):
-
         if not os.path.exists(self.file_path):
-
-            df = pd.DataFrame(columns=self.columns)
-
-            df.to_csv(
+            pd.DataFrame(columns=self.columns).to_csv(
                 self.file_path,
                 index=False
             )
+
+    def _read_history(self):
+        """Read history safely, including an empty CSV."""
+        try:
+            df = pd.read_csv(self.file_path)
+        except (pd.errors.EmptyDataError, FileNotFoundError):
+            df = pd.DataFrame(columns=self.columns)
+
+        # Ensure all required columns exist.
+        for column in self.columns:
+            if column not in df.columns:
+                df[column] = pd.NA
+
+        return df[self.columns]
 
     def save(
         self,
@@ -48,7 +57,6 @@ class TradeHistory:
         timeframe,
         status
     ):
-
         now = datetime.now()
 
         row = {
@@ -62,15 +70,13 @@ class TradeHistory:
             "Status": status
         }
 
-        df = pd.read_csv(self.file_path)
-
+        df = self._read_history()
         df.loc[len(df)] = row
 
-        df.to_csv(
-            self.file_path,
-            index=False
-        )
+        # Write to a temporary file before replacing history.
+        temp_path = self.file_path + ".tmp"
+        df.to_csv(temp_path, index=False)
+        os.replace(temp_path, self.file_path)
 
     def load(self):
-
-        return pd.read_csv(self.file_path)
+        return self._read_history()
